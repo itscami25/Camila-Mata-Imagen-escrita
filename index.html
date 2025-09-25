@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portafolio Camila Mata</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #8ca0d7;
+      color: white;
+      overflow-x: hidden;
+    }
+    #generative-header {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      z-index: 0;
+    }
+    #defaultCanvas0 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .divider {
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+      box-shadow: 0 0 15px rgba(255,255,255,0.4);
+      position: relative;
+      z-index: 1;
+    }
+    #header-title {
+      text-align: center;
+      margin: 20px auto 20px auto;
+      font-size: 2.5em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 2;
+    }
+    .hamburger-wrapper {
+      position: sticky;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+    }
+    .hamburger {
+      width: 35px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .hamburger div {
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.4s ease;
+      transform-origin: center;
+    }
+    .hamburger.active div:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active div:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      transition: left 0.5s ease;
+      z-index: 9;
+      padding-top: 60px;
+    }
+    .sidebar.active {
+      left: 0;
+    }
+    .sidebar a {
+      display: block;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      font-size: 1.2em;
+      transition: background 0.3s ease;
+    }
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .text-box {
+      max-width: 900px;
+      margin: 0 auto 60px auto;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 30px;
+      font-size: 1.1em;
+      line-height: 1.6em;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .text-box.scrollable {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 15px;
+      position: relative;
+    }
+    .text-box.scrollable::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.1));
+      pointer-events: none;
+    }
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+      perspective: 2000px;
+      overflow: visible;
+    }
+    .carousel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.8s ease;
+      transform-style: preserve-3d;
+    }
+    .carousel-item {
+      position: absolute;
+      width: 60%;
+      opacity: 0.4;
+      transform: scale(0.7) translateZ(-300px) rotateY(45deg);
+      filter: blur(4px);
+      transition: all 0.8s ease;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .carousel-item.active {
+      position: relative;
+      opacity: 1;
+      transform: scale(1) translateZ(0) rotateY(0);
+      filter: blur(0);
+      z-index: 2;
+    }
+    .carousel-item.left {
+      transform: scale(0.8) translateX(-60%) rotateY(25deg);
+      z-index: 1;
+    }
+    .carousel-item.right {
+      transform: scale(0.8) translateX(60%) rotateY(-25deg);
+      z-index: 1;
+    }
+    .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      font-size: 2em;
+      cursor: pointer;
+      padding: 15px;
+      border-radius: 50%;
+      z-index: 3;
+      backdrop-filter: blur(4px);
+      transition: background 0.3s ease;
+    }
+    .carousel-button:hover {
+      background: rgba(255,255,white,0.3);
+    }
+    .carousel-button.left {
+      left: 20px;
+    }
+    .carousel-button.right {
+      right: 20px;
+    }
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 15px;
+    }
+    .card-content iframe {
+      width: 100%;
+      height: 350px;
+      border: none;
+      border-radius: 10px;
+    }
+    .bottom-bar {
+      width: 100%;
+      height: 150px;
+      margin-top: 180px;
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      color: white;
+    }
+    .bottom-bar-left,
+    .bottom-bar-right {
+      background-color: rgba(0,0,0,0.6);
+      height: 100%;
+      flex: 1;
+      display: flex;
+    }
+    .bottom-bar-center {
+      width: 150px;
+      height: 100%;
+      background-color: transparent;
+    }
+    .bottom-bar-left div,
+    .bottom-bar-right div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 20px;
+    }
+    .bottom-bar-right div {
+      align-items: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div id="generative-header"></div>
+  <div class="divider"></div>
+
+  <h1 id="header-title">Portafolio Camila Mata</h1>
+
+  <div class="hamburger-wrapper">
+    <div class="hamburger" id="hamburger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <a href="#">Inicio</a>
+    <a href="#">Proyectos</a>
+    <a href="#">Contacto</a>
+    <a href="#">Sobre mí</a>
+  </div>
+
+  <div class="text-box">
+    <p>La asignatura de imagen escrita se enfoca en la unión entre diseñar,
+       programar y generar, trayendo a la vida formas de repetición qué solo
+        podríamos llegar a imaginar, haciendo que estas ideas se vuelvan visibles
+         en este ámbito virtual.</p>
+    <p>Este trabajo esta hecho a base de p5.js y github, siendo los traductores e
+     intermediarios para la correcta ejecución de cada código utilizado para esta web.</p>
+    <p>Este curso nos enseñó que el pensamiento humano puede convivir con el pensamiento
+     computacional, llegando a ser una buena herramienta para el diseñador, entregándole
+      nuevas herramientas para nuevas posibilidades creativas.</p>
+  </div>
+
+  <div class="carousel-container">
+    <button class="carousel-button left">&#10094;</button>
+    <div class="carousel" id="carousel">
+      <div class="carousel-item active">
+        <div class="card-content">
+          <iframe src="https://editor.p5js.org/itcami25/full/RV0Nx8jaH"></iframe>
+          <h3>Tarea 1</h3>
+        </div>
+      </div>
+
+      <div class="carousel-item right">
+        <div class="card-content">
+          <iframe src="https://editor.p5js.org/itcami25/full/HFawkFuju"></iframe>
+          <h3>Tarea 2</h3>
+        </div>
+      </div>
+
+      <div class="carousel-item hidden">
+        <div class="card-content">
+          <iframe src="https://editor.p5js.org/itcami25/full/A3H27Efa5"></iframe>
+          <h3>Tarea 3</h3>
+        </div>
+      </div>
+
+      <div class="carousel-item hidden">
+        <div class="card-content">
+          <iframe src="https://editor.p5js.org/itcami25/full/rUHJKYwHI"></iframe>
+          <h3>Tarea 4</h3>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-button right">&#10095;</button>
+  </div>
+
+  <a
+    href="https://wiki.ead.pucv.cl/Sitio_Web_IE_-_Camila_Mata"
+    target="_blank"
+    style="text-decoration: none;"
+  >
+    <div
+      style="
+        border: 2px solid #4A90E2;
+        border-radius: 15px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        color: #333;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+        max-width: 300px;
+        margin: 50px auto;
+      "
+      onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.2)';"
+      onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';"
+    >
+      Wiki del proyecto
+    </div>
+  </a>
+
+  <div class="bottom-bar">
+    <div class="bottom-bar-left">
+      <div>
+        <p>Email: camila.mata.c@mail.pucv.cl</p>
+        <p>Tel: +56967305213</p>
+        <p>GitHub: github.com/itscami25</p>
+      </div>
+    </div>
+    <div class="bottom-bar-center"></div>
+    <div class="bottom-bar-right">
+      <div>
+        <p>Sobre mí</p>
+        <p>
+          Hola, soy Camila Mata, estudiante de la carrera de diseño en la
+          Pontificia Universidad Católica de Valparaíso, este trabajo es una
+          muestra de gran parte de todo lo que he aprendido durante este
+          semestre en imagen escrita, usando distintos tipos de elementos para
+          mostrar mis tareas semana a semana.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script>
+    let stars = [];
+    let baseColor;
+    let noiseOffset = 0;
+
+    function setup() {
+      let canvas = createCanvas(window.innerWidth, 300);
+      canvas.parent("generative-header");
+      baseColor = color(140, 120, 215);
+      noStroke();
+
+      for (let i = 0; i < 50; i++) stars.push(new Star());
+    }
+
+    function draw() {
+      noiseOffset += 0.01;
+      let n = noise(noiseOffset) * 50;
+      let c = color(
+        red(baseColor) + n,
+        green(baseColor) + n / 2,
+        blue(baseColor) + n / 3
+      );
+      background(c);
+
+      for (let s of stars) {
+        s.update();
+        s.show();
+      }
+    }
+
+    class Star {
+      constructor() {
+        this.x = random(width);
+        this.y = random(height);
+        this.r = random(12, 20);
+        this.xSpeed = random(1, 2) * (random() > 0.5 ? 1 : -1);
+        this.ySpeed = random(1, 2) * (random() > 0.5 ? 1 : -1);
+        this.trail = [];
+      }
+      update() {
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+        if (this.x < 0 || this.x > width) this.xSpeed *= -1;
+        if (this.y < 0 || this.y > height) this.ySpeed *= -1;
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > 12) this.trail.shift();
+      }
+      show() {
+        for (let i = 0; i < this.trail.length; i++) {
+          let alpha = map(i, 0, this.trail.length, 50, 180);
+          fill(255, alpha);
+          let pos = this.trail[i];
+          drawStar(pos.x, pos.y, this.r * 0.3, this.r * 0.6, 5);
+        }
+        fill(255);
+        drawStar(this.x, this.y, this.r * 0.5, this.r, 5);
+      }
+    }
+
+    function drawStar(x, y, radius1, radius2, npoints) {
+      let angle = TWO_PI / npoints;
+      let halfAngle = angle / 2.0;
+      beginShape();
+      for (let a = 0; a < TWO_PI; a += angle) {
+        let sx = x + cos(a) * radius2;
+        let sy = y + sin(a) * radius2;
+        vertex(sx, sy);
+        sx = x + cos(a + halfAngle) * radius1;
+        sy = y + sin(a + halfAngle) * radius1;
+        vertex(sx, sy);
+      }
+      endShape(CLOSE);
+    }
+
+    function windowResized() {
+      resizeCanvas(window.innerWidth, 300);
+    }
+
+    const items = document.querySelectorAll(".carousel-item");
+    let activeIndex = 0;
+    function updateCarousel() {
+      items.forEach((item, i) => {
+        item.classList.remove("active", "left", "right");
+        if (i === activeIndex) item.classList.add("active");
+        else if (i === (activeIndex - 1 + items.length) % items.length)
+          item.classList.add("left");
+        else if (i === (activeIndex + 1) % items.length)
+          item.classList.add("right");
+      });
+    }
+    document
+      .querySelector(".carousel-button.left")
+      .addEventListener("click", () => {
+        activeIndex = (activeIndex - 1 + items.length) % items.length;
+        updateCarousel();
+      });
+    document
+      .querySelector(".carousel-button.right")
+      .addEventListener("click", () => {
+        activeIndex = (activeIndex + 1) % items.length;
+        updateCarousel();
+      });
+    updateCarousel();
+  </script>
+</body>
+</html>
